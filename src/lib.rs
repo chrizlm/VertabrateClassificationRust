@@ -1,15 +1,10 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
-use near_sdk::env::attached_deposit;
-use near_sdk::{near_bindgen, setup_alloc, env, AccountId, Promise, StorageUsage};
+use near_sdk::{near_bindgen, env, AccountId, Promise, StorageUsage};
 use near_sdk::collections::Vector;
 use near_sdk::collections::LookupMap;
-use near_sdk::serde_json::to_vec;
-use serde::{Deserialize, Serialize};
 
 
 
-use std::io;
-use std::env as other_env;
 mod vertabrate;
 mod invertabrate;
 
@@ -28,7 +23,6 @@ use crate::vertabrate::VertabrateConst::Amphibians;
 use crate::vertabrate::VertabrateConst::Reptile;
 use crate::invertabrate::InvertabratesConst::Invertabrate as EnumInvertabrate;
 
-setup_alloc!();
 
 
 //wrap in struct
@@ -42,8 +36,7 @@ pub struct Classification{
 
 impl Default for Classification{
     fn default() -> Self {
-        Self{ store: LookupMap::new(b"s".to_vec()) }
-    }
+        Self{ store: LookupMap::new(b"s")}  }
 }
 
 
@@ -64,7 +57,7 @@ impl Classification {
                 let excess = if surplus > 0 { surplus } else { 0 };
 
                 if excess > 0 {
-                    let mut promise = Promise::new(signer);
+                    let promise = Promise::new(signer);
                     promise.transfer(excess);
                 }
             }
@@ -152,7 +145,6 @@ impl Classification {
 
         let initial_storage = env::storage_usage();
         let signer = env::signer_account_id();
-        let attached_deposit_amount = env::attached_deposit();
 
 
         if let Some(mut animals_data_store) = self.store.get(&signer){
@@ -161,6 +153,8 @@ impl Classification {
             let display_animal = vert_animal.clone();
             let initial_storage = env::storage_usage();
             animals_data_store.push(&vert_animal);
+
+            self.store.insert(&signer, &animals_data_store);
 
 
             Classification::storage_staking(initial_storage);
@@ -171,7 +165,7 @@ impl Classification {
 
 
         }else {
-            let mut animals_data_store: Vector<Vertabrate> = Vector::new(b"a");
+            let mut animals_data_store: Vector<Vertabrate> = Vector::new(b"n");
 
             let vert_animal = Classification::classification_template(initial_storage, animal_name, backbone, constbodytemp, xtics);
             let display_animal = vert_animal.clone();
@@ -195,11 +189,11 @@ impl Classification {
 
 pub fn display_classified_vert(&self) -> Vec<Vertabrate>{
     let signer = env::signer_account_id();
-    if let Some(mut animals_data_store) = self.store.get(&signer){
+    if let Some(animals_data_store) = self.store.get(&signer){
         animals_data_store.to_vec()
     }else {
         let mut animals_data_store = Vector::new(b"a");
-        let mut vert_animal_prop = Vertabrate::default();
+        let vert_animal_prop = Vertabrate::default();
         animals_data_store.push(&vert_animal_prop);
         animals_data_store.to_vec()
     }
@@ -212,6 +206,7 @@ pub fn remove_animal(&mut self) {
     let signer = env::signer_account_id();
     if let Some(mut animals_data_store) = self.store.get(&signer){
         animals_data_store.pop();
+        self.store.insert(&signer, &animals_data_store);
     }
 }
 
@@ -226,12 +221,13 @@ pub fn remove_all_animals(&mut self) {
     let signer = env::signer_account_id();
     if let Some(mut animals_data_store) = self.store.get(&signer){
         animals_data_store.clear();
+        self.store.insert(&signer, &animals_data_store);
     }
 }
 
 
     //classify invertabrates
-    pub fn classify_invertabrates(&self, mut invert_animal_prop: Invertabrate) -> Invertabrate{
+    pub fn classify_invertabrates(&self, invert_animal_prop: Invertabrate) -> Invertabrate{
         
         //let mut animals_data_store = self.store;
 
@@ -268,7 +264,7 @@ pub fn remove_all_animals(&mut self) {
 #[cfg(test)]
 mod tests {
 
-    use crate::{vertabrate::{Vertabrate, VertabrateConst}, invertabrate::{Invertabrate, InvertabratesConst}, Classification};
+    use crate::{vertabrate::{Vertabrate, VertabrateConst}, invertabrate::{Invertabrate, InvertabratesConst}};
 
 
     #[test]
@@ -328,76 +324,6 @@ mod tests {
         assert_eq!(invert_animal.get_invert_class(), "Arthropods".to_string());
     }
 
-  /* 
-    //following test individually
-    //#[test]
-    fn test_vert(){
-        let test_obj = Vertabrate::default();
-        let test_name = test_obj.get_name();
-        let test_db: Vec<Vertabrate> = vec![];
-        let class_test_obj = Classification::classify_vertabrates(test_obj, test_db);
-
-        assert_eq!(class_test_obj.get_name(), test_name);
-    }
-
-    //#[test]
-    fn test_invert(){
-        let test_obj = Invertabrate::default();
-        let test_name = test_obj.get_invert_name();
-        let test_db: Vec<Vertabrate> = vec![];
-        let class_test_obj = Classification::classify_invertabrates(test_obj, test_db);
-
-        assert_eq!(class_test_obj.get_invert_name(), test_name);
-    }
-
-    //#[test]
-    fn test_warm_blooded(){
-        let mut test_obj = Vertabrate::default();
-        test_obj.set_class(VertabrateConst::ColdBlooded);
-        let test_class = test_obj.get_class();
-        let test_db: Vec<Vertabrate> = vec![];
-        let warm_test_obj = Classification::classify_warm_blooded(test_obj, test_db);
-
-        assert_eq!(warm_test_obj.get_class(), test_class);
-    }
-
-    //#[test]
-    fn test_cold_blooded(){
-        let mut test_obj = Vertabrate::default();
-        test_obj.set_class(VertabrateConst::ColdBlooded);
-        let test_class = test_obj.get_class();
-        let test_db: Vec<Vertabrate> = vec![];
-        let cold_test_obj = Classification::classify_cold_bloodeed(test_obj, test_db);
-
-        assert_eq!(cold_test_obj.get_class(), test_class);
-    }
-
-    //#[test]
-    fn test_another_vert(){
-        let mut test_obj = Vertabrate::default();
-        test_obj.set_subclass(VertabrateConst::Mammals);
-        let test_subclass = test_obj.get_subclass();
-        let test_db: Vec<Vertabrate> = vec![];
-        let another_vert = Classification::classify_another_vert(test_obj, test_db);
-
-        assert_eq!(another_vert[0].get_subclass(), test_subclass);
-    }
-
-    //#[test]
-    fn test_another_invert(){
-        let mut test_db: Vec<Vertabrate> = vec![];
-        let test_db_duplicate = test_db.clone();
-        let another_invert = Classification::classify_another_invert(test_db);
-
-        assert_eq!(another_invert.len(), test_db_duplicate.len());
-    }
-    
-    #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
-    }
-
- */
+  
 
 }

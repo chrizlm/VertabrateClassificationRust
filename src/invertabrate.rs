@@ -1,9 +1,8 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
-use near_sdk::{near_bindgen, setup_alloc};
+use near_sdk::near_bindgen;
 use serde::{Deserialize, Serialize};
 
 
-setup_alloc!();
 
 
 //constants for invertabrates

@@ -1,13 +1,12 @@
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
-use near_sdk::{near_bindgen, setup_alloc};
+use near_sdk::near_bindgen;
 use serde::{Deserialize, Serialize};
 
 
 
-use std::fmt::{Debug};
+use std::fmt::Debug;
 use std::string::ToString;
 
-setup_alloc!();
 
 
 #[near_bindgen]
