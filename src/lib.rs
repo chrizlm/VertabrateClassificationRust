@@ -5,23 +5,23 @@ use near_sdk::collections::LookupMap;
 
 
 
-mod vertabrate;
-mod invertabrate;
+mod vertebrate;
+mod invertebrate;
 
-use crate::vertabrate::Vertabrate;
-use crate::invertabrate::Invertabrate;
+use crate::vertebrate::Vertebrate;
+use crate::invertebrate::Invertebrate;
 
 //enum crates
-use crate::vertabrate::VertabrateConst::Vertabrate as EnumVertabrate;
-use crate::vertabrate::VertabrateConst::ColdBlooded;
-use crate::vertabrate::VertabrateConst::WarmBlooded;
-use crate::vertabrate::VertabrateConst::Mammals;
-use crate::vertabrate::VertabrateConst::Birds;
-use crate::vertabrate::VertabrateConst::Insect;
-use crate::vertabrate::VertabrateConst::Fish;
-use crate::vertabrate::VertabrateConst::Amphibians;
-use crate::vertabrate::VertabrateConst::Reptile;
-use crate::invertabrate::InvertabratesConst::Invertabrate as EnumInvertabrate;
+use crate::vertebrate::VertebrateConst::Vertebrate as EnumVertebrate;
+use crate::vertebrate::VertebrateConst::ColdBlooded;
+use crate::vertebrate::VertebrateConst::WarmBlooded;
+use crate::vertebrate::VertebrateConst::Mammals;
+use crate::vertebrate::VertebrateConst::Birds;
+use crate::vertebrate::VertebrateConst::Insect;
+use crate::vertebrate::VertebrateConst::Fish;
+use crate::vertebrate::VertebrateConst::Amphibians;
+use crate::vertebrate::VertebrateConst::Reptile;
+use crate::invertebrate::InvertebratesConst::Invertebrate as EnumInvertebrate;
 
 
 
@@ -30,10 +30,10 @@ use crate::invertabrate::InvertabratesConst::Invertabrate as EnumInvertabrate;
 #[derive(Debug, BorshDeserialize, BorshSerialize)]
 pub struct Classification{
     /*
-     * define a storage for the vertabrate animals classified
+     * define a storage for the vertebrate animals classified
      * attach account id of signer
      * */
-    store: LookupMap<AccountId, Vector<Vertabrate>>,
+    store: LookupMap<AccountId, Vector<Vertebrate>>,
 }
 
 
@@ -72,11 +72,11 @@ impl Classification {
 
 
     //method to handle classification of vetabrate animals
-    pub fn classification_template(initial_storage: StorageUsage, animal_name: String, backbone: String, constbodytemp: String, xtics: String) -> Vertabrate{
+    pub fn classification_template(initial_storage: StorageUsage, animal_name: String, backbone: String, constbodytemp: String, xtics: String) -> Vertebrate{
 
         //create default objects of animals
-        let mut vert_animal_prop = Vertabrate::default();
-        let mut invert_animal_prop = Invertabrate::default();
+        let mut vert_animal_prop = Vertebrate::default();
+        let mut invert_animal_prop = Invertebrate::default();
 
 
         //get the options
@@ -93,7 +93,7 @@ impl Classification {
         //classify according to backbone
         if backbone == one {
             vert_animal_prop.set_name(animal_name);
-            vert_animal_prop.set_phylum(EnumVertabrate);
+            vert_animal_prop.set_phylum(EnumVertebrate);
 
             //classification according to body temperature
             if constbodytemp == one {
@@ -133,8 +133,8 @@ impl Classification {
         } else if backbone == two {
             /* classify according to backbone */
             invert_animal_prop.set_invert_name(animal_name);
-            invert_animal_prop.set_invert_phylum(EnumInvertabrate);
-            env::log_str("we only classify vertabrate here");
+            invert_animal_prop.set_invert_phylum(EnumInvertebrate);
+            env::log_str("we only classify vertebrate here");
 
                 //check if amount excess for that process
                 Classification::storage_staking(initial_storage);
@@ -149,7 +149,7 @@ impl Classification {
 
     //classification method 
     #[payable]
-    pub fn classify_vert_animal(&mut self, animal_name: String, backbone: String, constbodytemp: String, xtics: String) -> Vertabrate{
+    pub fn classify_vert_animal(&mut self, animal_name: String, backbone: String, constbodytemp: String, xtics: String) -> Vertebrate{
 
 
         let initial_storage = env::storage_usage();
@@ -174,7 +174,7 @@ impl Classification {
 
         }else {
             /*if signer is new push into a new collection and attach their account id */
-            let mut animals_data_store: Vector<Vertabrate> = Vector::new(b"n");
+            let mut animals_data_store: Vector<Vertebrate> = Vector::new(b"n");
 
             let vert_animal = Classification::classification_template(initial_storage, animal_name, backbone, constbodytemp, xtics);
             let display_animal = vert_animal.clone();
@@ -195,14 +195,14 @@ impl Classification {
 
 
 
-//display all vertabrates classified 
-pub fn display_classified_vert(&self) -> Vec<Vertabrate>{
+//display all vertebrates classified 
+pub fn display_classified_vert(&self) -> Vec<Vertebrate>{
     let signer = env::signer_account_id();
     if let Some(animals_data_store) = self.store.get(&signer){
         animals_data_store.to_vec()
     }else {
         let mut animals_data_store = Vector::new(b"a");
-        let vert_animal_prop = Vertabrate::default();
+        let vert_animal_prop = Vertebrate::default();
         animals_data_store.push(&vert_animal_prop);
         animals_data_store.to_vec()
     }
@@ -236,12 +236,12 @@ pub fn remove_all_animals(&mut self) {
 }
 
 
-    //classify invertabrates
-    pub fn classify_invertabrates(&self, invert_animal_prop: Invertabrate) -> Invertabrate{
+    //classify invertebrates
+    pub fn classify_invertebrates(&self, invert_animal_prop: Invertebrate) -> Invertebrate{
         
         //let mut animals_data_store = self.store;
 
-        //array of invertabrate classes
+        //array of invertebrate classes
         let invert_array = [
             "Arthropods",
             "Mollusks",
@@ -253,7 +253,7 @@ pub fn remove_all_animals(&mut self) {
             "Cnidarias",
         ];
         
-        env::log_str("the animal is not a vertabrate but is in one of the following classes of invertabrates");
+        env::log_str("the animal is not a vertebrate but is in one of the following classes of invertebrates");
 
         for class in 0..invert_array.len() {
             near_sdk::log!("{}", invert_array[class]);
@@ -274,16 +274,16 @@ pub fn remove_all_animals(&mut self) {
 #[cfg(test)]
 mod tests {
 
-    use crate::{vertabrate::{Vertabrate, VertabrateConst}, invertabrate::{Invertabrate, InvertabratesConst}};
+    use crate::{vertebrate::{Vertebrate, VertebrateConst}, invertebrate::{Invertebrate, InvertebratesConst}};
 
     /*
-    test if the defaults for both vertabrate and invertabrates are functioning
-    and also if the methods are all properlly functioning
+    test if the defaults for both vertebrate and invertebrates are functioning
+    and also if the methods are all properlly functionine
     */
 
     #[test]
     fn test_vert_animal_default_properties(){
-        let vert_animal = Vertabrate::default();
+        let vert_animal = Vertebrate::default();
         assert_eq!(vert_animal.get_name(), "animal-name".to_string());
         assert_eq!(vert_animal.get_phylum(), "None".to_string());
         assert_eq!(vert_animal.get_class(), "None".to_string());
@@ -293,12 +293,12 @@ mod tests {
 
     #[test]
     fn test_vert_animal_properties(){
-        let mut vert_animal = Vertabrate::default();
+        let mut vert_animal = Vertebrate::default();
 
         let name = "vert_animal".to_string();
-        let phylum = VertabrateConst::Vertabrate;
-        let class = VertabrateConst::WarmBlooded;
-        let subclass = VertabrateConst::Mammals;
+        let phylum = VertebrateConst::Vertebrate;
+        let class = VertebrateConst::WarmBlooded;
+        let subclass = VertebrateConst::Mammals;
 
 
         vert_animal.set_name(name);
@@ -307,14 +307,14 @@ mod tests {
         vert_animal.set_subclass(subclass);
 
         assert_eq!(vert_animal.get_name(), "vert_animal".to_string());
-        assert_eq!(vert_animal.get_phylum(), "Vertabrate".to_string());
+        assert_eq!(vert_animal.get_phylum(), "Vertebrate".to_string());
         assert_eq!(vert_animal.get_class(), "WarmBlooded".to_string());
         assert_eq!(vert_animal.get_subclass(), "Mammals".to_string());
     }
 
     #[test]
     fn test_invert_animal_default_properties(){
-        let invert_animal = Invertabrate::default();
+        let invert_animal = Invertebrate::default();
         assert_eq!(invert_animal.get_invert_name(), "animal-name".to_string());
         assert_eq!(invert_animal.get_invert_phylum(), "None".to_string());
         assert_eq!(invert_animal.get_invert_class(), "None".to_string());
@@ -323,18 +323,18 @@ mod tests {
 
     #[test]
     fn test_invert_animal_properties(){
-        let mut invert_animal = Invertabrate::default();
+        let mut invert_animal = Invertebrate::default();
 
         let name = "invert_animal".to_string();
-        let phylum = InvertabratesConst::Invertabrate;
-        let class = InvertabratesConst::Arthropods;
+        let phylum = InvertebratesConst::Invertebrate;
+        let class = InvertebratesConst::Arthropods;
 
         invert_animal.set_invert_name(name);
         invert_animal.set_invert_phylum(phylum);
         invert_animal.set_invert_class(class);
 
         assert_eq!(invert_animal.get_invert_name(), "invert_animal".to_string());
-        assert_eq!(invert_animal.get_invert_phylum(), "Invertabrate".to_string());
+        assert_eq!(invert_animal.get_invert_phylum(), "Invertebrate".to_string());
         assert_eq!(invert_animal.get_invert_class(), "Arthropods".to_string());
     }
 
