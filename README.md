@@ -1,4 +1,4 @@
-# VertabrateClassificationRust
+# VertebrateClassificationRust
 
 About
 This project is about classification of animals using their common features in particular vertebrates. It can help children to learn about classification by being able to classify animals around them such as their pets
