@@ -29,11 +29,15 @@ use crate::invertabrate::InvertabratesConst::Invertabrate as EnumInvertabrate;
 #[near_bindgen]
 #[derive(Debug, BorshDeserialize, BorshSerialize)]
 pub struct Classification{
+    /*
+     * define a storage for the vertabrate animals classified
+     * attach account id of signer
+     * */
     store: LookupMap<AccountId, Vector<Vertabrate>>,
 }
 
 
-
+//default for the struct
 impl Default for Classification{
     fn default() -> Self {
         Self{ store: LookupMap::new(b"s")}  }
@@ -44,6 +48,7 @@ impl Default for Classification{
 #[near_bindgen]
 impl Classification {
 
+    //storage staking method to handle excess amount
     pub fn storage_staking(initial_storage: StorageUsage){
         let attached_deposit_amount = env::attached_deposit();
         let signer = env::signer_account_id();
@@ -66,6 +71,7 @@ impl Classification {
     }
 
 
+    //method to handle classification of vetabrate animals
     pub fn classification_template(initial_storage: StorageUsage, animal_name: String, backbone: String, constbodytemp: String, xtics: String) -> Vertabrate{
 
         //create default objects of animals
@@ -100,12 +106,15 @@ impl Classification {
                     vert_animal_prop.set_subclass(Mammals);
                 }
 
-
+                //check if amount excess for that process
                 Classification::storage_staking(initial_storage);
 
 
-            }else if constbodytemp == two {
+            } else if constbodytemp == two {
+                /* classification according to body temperature */
                 vert_animal_prop.set_class(ColdBlooded);
+                
+                //other characteristics
                 if xtics == threeparts{
                     vert_animal_prop.set_subclass(Insect);
                 } else if xtics == gills{
@@ -116,19 +125,19 @@ impl Classification {
                     vert_animal_prop.set_subclass(Reptile);
                 }
 
-
+                //check if amount excess for that process
                 Classification::storage_staking(initial_storage);
 
             }
-        }
-        else if backbone == two {
+        
+        } else if backbone == two {
+            /* classify according to backbone */
             invert_animal_prop.set_invert_name(animal_name);
             invert_animal_prop.set_invert_phylum(EnumInvertabrate);
             env::log_str("we only classify vertabrate here");
 
-
-            Classification::storage_staking(initial_storage);
-
+                //check if amount excess for that process
+                Classification::storage_staking(initial_storage);
 
         }
 
@@ -138,7 +147,7 @@ impl Classification {
     
    
 
-    //classification method ... classify animals according to backbone existance
+    //classification method 
     #[payable]
     pub fn classify_vert_animal(&mut self, animal_name: String, backbone: String, constbodytemp: String, xtics: String) -> Vertabrate{
 
@@ -147,6 +156,7 @@ impl Classification {
         let signer = env::signer_account_id();
 
 
+        //if signer had already classified add to their collection
         if let Some(mut animals_data_store) = self.store.get(&signer){
 
            let vert_animal = Classification::classification_template(initial_storage, animal_name, backbone, constbodytemp, xtics);
@@ -162,9 +172,8 @@ impl Classification {
             display_animal
 
 
-
-
         }else {
+            /*if signer is new push into a new collection and attach their account id */
             let mut animals_data_store: Vector<Vertabrate> = Vector::new(b"n");
 
             let vert_animal = Classification::classification_template(initial_storage, animal_name, backbone, constbodytemp, xtics);
@@ -186,7 +195,7 @@ impl Classification {
 
 
 
-
+//display all vertabrates classified 
 pub fn display_classified_vert(&self) -> Vec<Vertabrate>{
     let signer = env::signer_account_id();
     if let Some(animals_data_store) = self.store.get(&signer){
@@ -201,7 +210,7 @@ pub fn display_classified_vert(&self) -> Vec<Vertabrate>{
 }
 
 
-
+//remove an animall from the collection
 pub fn remove_animal(&mut self) {
     let signer = env::signer_account_id();
     if let Some(mut animals_data_store) = self.store.get(&signer){
@@ -211,12 +220,13 @@ pub fn remove_animal(&mut self) {
 }
 
 
+//check the signers id
 pub fn check_account(&mut self) -> AccountId {
     env::signer_account_id()
 }
 
     
-
+//remove all animals in the collection
 pub fn remove_all_animals(&mut self) {
     let signer = env::signer_account_id();
     if let Some(mut animals_data_store) = self.store.get(&signer){
@@ -266,6 +276,10 @@ mod tests {
 
     use crate::{vertabrate::{Vertabrate, VertabrateConst}, invertabrate::{Invertabrate, InvertabratesConst}};
 
+    /*
+    test if the defaults for both vertabrate and invertabrates are functioning
+    and also if the methods are all properlly functioning
+    */
 
     #[test]
     fn test_vert_animal_default_properties(){

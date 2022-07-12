@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#note: you can change the account id to the one you have signed in with
+
 
 #add items
 near call test.chrislm.testnet classify_vert_animal '{"animal_name": "Cat", "backbone": "Yes", "constbodytemp": "Yes", "xtics": "Far"}' --accountId test.chrislm.testnet --amount 2
@@ -20,7 +22,3 @@ near call test.chrislm.testnet remove_animal  --accountId test.chrislm.testnet
 
 #views the whole list
 near call test.chrislm.testnet display_classified_vert --accountId test.chrislm.testnet
-
-
-
-
