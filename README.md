@@ -1,5 +1,7 @@
 # VertebrateClassificationRust
 
+loom video link: https://www.loom.com/share/5f4863a303054149ba38c7728969f02d
+
 About
 This project is about classification of animals using their common features in particular vertebrates. It can help children to learn about classification by being able to classify animals around them such as their pets
 
