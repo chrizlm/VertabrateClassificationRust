@@ -17,9 +17,9 @@ The struct has the following methods:
 
 a). Storage staking - checks if user attached excess amount and refunds
 
-b). Classification template - method that handles the classification
+b). Classification template - method that handles the classification by passing the traits of the animal and it will classify
 
-c). Classify vert animal - this method is payable and is the main method for classification struct
+c). Classify vert animal - this method is payable and is the main method for classification struct, it will check if signer had earlier stored classified animal if so the other animals classified will be added to the storage of signer if not a new storage will be created and signer account id attached
 
 ii). Display classified vert - displays a list of all vertebrates that have been classified
 
@@ -47,3 +47,7 @@ This project can be expanded to a bigger and broader classification of animals i
 OTHER FILES
 
 It has a script folder containing bash scripts such as bash.sh and deploy.sh that have scripts for compiling and deploying the smart contract and call.sh that contain scripts for all call functions to the smart contract
+
+How it works
+
+run the build.sh file then the deploy.sh after that you can run the call.sh file and the scripts for the call function in the classification method will be executed
